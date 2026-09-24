@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { s3, BUCKET } from "@/lib/storage";
 import { putUpload } from "@/lib/store";
 import { resumeKey } from "@/lib/keys";
+import { requireUser } from "@/lib/user";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED = new Set([
@@ -14,7 +15,9 @@ const ALLOWED = new Set([
 ]);
 
 export async function POST(req: NextRequest) {
-  const { filename, contentType, size, userId = "demo-user" } = await req.json();
+  const { userId, denied } = await requireUser();
+  if (denied) return denied;
+  const { filename, contentType, size } = await req.json();
 
   if (!filename || !contentType) {
     return NextResponse.json({ error: "filename and contentType required" }, { status: 400 });

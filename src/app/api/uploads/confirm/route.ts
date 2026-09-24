@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { s3, BUCKET } from "@/lib/storage";
 import { getUpload, patchUpload } from "@/lib/store";
+import { requireUser } from "@/lib/user";
 
 // The client saying "it worked" proves nothing. This asks storage directly.
 export async function POST(req: NextRequest) {
-  const { uploadId, userId = "demo-user" } = await req.json();
+  const { userId, denied } = await requireUser();
+  if (denied) return denied;
+  const { uploadId } = await req.json();
   if (!uploadId) return NextResponse.json({ error: "uploadId required" }, { status: 400 });
 
   const rec = await getUpload(userId, uploadId);

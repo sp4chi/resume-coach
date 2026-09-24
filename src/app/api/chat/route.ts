@@ -1,14 +1,12 @@
 import { NextRequest } from "next/server";
 import { getResumeText, getTurns, appendTurn } from "@/lib/store";
 import { buildMessages, streamChat } from "@/lib/llm";
+import { requireUser } from "@/lib/user";
 
 export async function POST(req: NextRequest) {
-  const {
-    message,
-    sessionId = "default",
-    uploadId,
-    userId = "demo-user",
-  } = await req.json();
+  const { userId, denied } = await requireUser();
+  if (denied) return denied;
+  const { message, sessionId = "default", uploadId } = await req.json();
 
   if (!message) return new Response("message required", { status: 400 });
 

@@ -3,13 +3,16 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { extractText, getDocumentProxy } from "unpdf";
 import { s3, BUCKET } from "@/lib/storage";
 import { getUpload, patchUpload, putResumeText } from "@/lib/store";
+import { requireUser } from "@/lib/user";
 
 // Text is pulled out ONCE, here, right after upload.
 // The chat route never opens the file again -- it reads the cached text.
 // This replaces AWS Textract. unpdf runs inside our own process, so it is
 // free and fast. Textract is only needed for scanned (image) resumes.
 export async function POST(req: NextRequest) {
-  const { uploadId, userId = "demo-user" } = await req.json();
+  const { userId, denied } = await requireUser();
+  if (denied) return denied;
+  const { uploadId } = await req.json();
   if (!uploadId) return NextResponse.json({ error: "uploadId required" }, { status: 400 });
 
   const rec = await getUpload(userId, uploadId);
