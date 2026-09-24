@@ -1,0 +1,15 @@
+# Local stand-ins so you can develop with no account and no credit card.
+#   localstack -> stands in for Cloudflare R2 / S3 (same API, and unlike MinIO
+#                 it supports per-bucket CORS rules, which we need to test)
+#   redis      -> stands in for Upstash Redis (same protocol)
+services:
+  localstack:
+    image: localstack/localstack:3.8
+    ports: ["4566:4566"]
+    environment:
+      SERVICES: s3
+      S3_SKIP_SIGNATURE_VALIDATION: "0"
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
