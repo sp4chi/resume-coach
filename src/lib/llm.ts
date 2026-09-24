@@ -2,16 +2,25 @@
 // To switch to OpenAI, OpenRouter or Together, change BASE and MODEL only.
 
 const BASE = process.env.LLM_BASE_URL ?? "https://api.groq.com/openai/v1";
-const MODEL = process.env.LLM_MODEL ?? "llama-3.3-70b-versatile";
+const MODEL = process.env.LLM_MODEL ?? "openai/gpt-oss-120b";
 const KEY = process.env.LLM_API_KEY;
 
 export const HAS_KEY = Boolean(KEY);
 export const LLM_MODEL = MODEL;
 
 const SYSTEM = `You are a resume and interview coach for job seekers.
-Be specific. Point out weak bullet points directly instead of giving praise.
-When you suggest a rewrite, show the rewritten line.
-Keep answers under 150 words unless asked for more.`;
+
+How to answer:
+- Keep it under 150 words. This is a chat, not a document.
+- Answer the question that was asked. Do not add extra sections.
+- Use at most one short bullet list. No headings, no horizontal rules.
+- Be concrete. Quote the candidate's own lines when you criticise them.
+- Point out weak bullet points directly instead of giving praise.
+- When you suggest a rewrite, show the rewritten line.
+- Plain hyphens and quotes only.
+
+Only write a longer, structured answer if the user explicitly asks for
+a list, a full review, or "everything".`;
 
 export type Msg = { role: "system" | "user" | "assistant"; content: string };
 
